@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol ViewControllerDelegate {
-    func retrunValue(text: String?)
-}
-
 class ViewController: UIViewController {
     
     @IBOutlet weak var myLabel: UILabel!
@@ -18,8 +14,6 @@ class ViewController: UIViewController {
     
     var count = 0
     var numString = ""
-    
-    var delegate: ViewControllerDelegate?
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -45,7 +39,6 @@ class ViewController: UIViewController {
     
     @IBAction func nextButtonDidTapped(_ sender: Any) {
         let nextVC = storyboard?.instantiateViewController(withIdentifier: "myVC") as! ViewController
-        nextVC.delegate = self
         if let text = myTextField.text, var counting = Int(myLabel.text!) {
             nextVC.numString = text
             counting += 1
@@ -58,7 +51,10 @@ class ViewController: UIViewController {
     
     @IBAction func backButtonDidTapped(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
-        self.delegate?.retrunValue(text: myTextField.text)
+        guard let viewController = presentingViewController as? ViewController, let text = myTextField.text else {
+            return
+        }
+        viewController.numString = text
     }
     
     @IBAction func rootButtonDidTapped(_ sender: Any) {
@@ -77,14 +73,6 @@ class ViewController: UIViewController {
             numString = text
         } else {
             numString = ""
-        }
-    }
-}
-
-extension ViewController: ViewControllerDelegate {
-    func retrunValue(text: String?) {
-        if let text = text {
-            self.numString = text
         }
     }
 }
